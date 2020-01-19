@@ -101,7 +101,8 @@ const styles = StyleSheet.create({
     footer : {
         flexDirection: 'column',
         backgroundColor: '#FFF',
-        padding: 10,
+        paddingTop: 10,
+        paddingHorizontal: 10,
         borderTopColor: '#bababa',
         borderTopWidth: 0.8,
     },

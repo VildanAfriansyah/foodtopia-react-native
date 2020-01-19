@@ -4,11 +4,15 @@ import {
     Input, 
     CardItem,
     Card,
+    ListItem,
 } from 'native-base'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import StarRating from 'react-native-star-rating'
-import LinearGradient from 'react-native-linear-gradient'
+import { connect } from 'react-redux'
 
+
+import { getItems } from '../redux/action/Item'
+import { APP_URL } from '../config/Config'
 
 const styles = StyleSheet.create({
   root : {
@@ -91,20 +95,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   column : {
-      flexDirection: 'column'
+      flexDirection: 'column',
   },
   row : {
       flexDirection: 'row',
   },
-    card : {
-      flexDirection: 'column',
-      backgroundColor: '#FFF',
-      padding: 10,
-      borderRadius: 10,
-      elevation: 50,
-      marginBottom: 10
+  card : {
+    flexDirection: 'column',
+    backgroundColor: '#FFF',
+    padding: 10,
+    borderRadius: 10,
+    elevation: 50,
+    marginBottom: 10
   },
-    image : {
+  image : {
     width: 100,
     height: 100,
     marginBottom: 15,
@@ -117,11 +121,27 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10
   },
+  rating : {
+    width: 100
+  }
     
     
   })
 
-export default class listItem extends Component {
+class listItem extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+        isLoading: true,
+    }
+  }
+  
+  async componentDidMount() {
+      await this.props.dispatch(getItems())
+      await this.setState({ isLoading: false })
+  }
+
     render() {
         return (
             <View style = { styles.root }>
@@ -150,32 +170,34 @@ export default class listItem extends Component {
               <View style = { styles.box }>
 
 
-                <TouchableOpacity onPress = { ()=>this.props.navigation.navigate('Detail')}>
+              {!this.state.isLoading && this.props.item.data.data.map((v, i) => {
+                return(
+                <TouchableOpacity key = {v.id_item} onPress = { ()=>this.props.navigation.navigate('Detail',{id : v.id_item})}>
                   <View style = { styles.card }>
                     <View style = { styles.column }>
                       <View style = { styles.row }>
                         <View style = { styles.image }>
-                          <Image style = { styles.image } source = {require('../../images/1.jpg')} />
+                          <Image style = { styles.image } source={{uri: APP_URL.concat(`image/item/${v.images}`)}} />
                         </View>
                         <View style = { styles.column }>
                           <View>
-                              <Text style = { styles.title }>Title</Text>
+                            <Text style = { styles.title }>{ v.item_name }</Text>
                           </View>
-                          <View>
-                            <StarRating style = { styles.rating }
+                          <View style = { styles.rating }>
+                            <StarRating
                                 fullStarColor = { '#F5D200' }
                                 starSize = { 15 }
                                 disabled = { true }
                                 maxStars = { 5 }
-                                rating = { 5 } 
+                                rating = { v.rate } 
                                 selectedStar = { (rating) => this.onStarRatingPress(rating)} 
                             />
                           </View>
                           <View>
-                            <Text style = { styles.price }>Price</Text>
+                            <Text style = { styles.price }>{ v.price }</Text>
                           </View>
                           <View>
-                            <Text style = { styles.price }>Total</Text>
+                            <Text style = { styles.price }>{ v.restaurant }</Text>
                           </View>
                         </View>
                       </View>
@@ -187,187 +209,19 @@ export default class listItem extends Component {
 
                   </View>
                 </TouchableOpacity>
-
-                <View style = { styles.card }>
-                  <View style = { styles.column }>
-                    <View style = { styles.row }>
-                      <View style = { styles.image }>
-                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
-                      </View>
-                      <View style = { styles.column }>
-                        <View>
-                            <Text style = { styles.title }>Title</Text>
-                        </View>
-                        <View>
-                          <StarRating style = { styles.rating }
-                              fullStarColor = { '#F5D200' }
-                              starSize = { 15 }
-                              disabled = { true }
-                              maxStars = { 5 }
-                              rating = { 5 } 
-                              selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                          />
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Price</Text>
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Total</Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-
-
-                <View style = { styles.lineStyle } />
-
-
-                </View>
-
-                <View style = { styles.card }>
-                  <View style = { styles.column }>
-                    <View style = { styles.row }>
-                      <View style = { styles.image }>
-                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
-                      </View>
-                      <View style = { styles.column }>
-                        <View>
-                            <Text style = { styles.title }>Title</Text>
-                        </View>
-                        <View>
-                          <StarRating style = { styles.rating }
-                              fullStarColor = { '#F5D200' }
-                              starSize = { 15 }
-                              disabled = { true }
-                              maxStars = { 5 }
-                              rating = { 5 } 
-                              selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                          />
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Price</Text>
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Total</Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-
-
-                <View style = { styles.lineStyle } />
-
-
-                </View>
-                <View style = { styles.card }>
-                  <View style = { styles.column }>
-                    <View style = { styles.row }>
-                      <View style = { styles.image }>
-                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
-                      </View>
-                      <View style = { styles.column }>
-                        <View>
-                            <Text style = { styles.title }>Title</Text>
-                        </View>
-                        <View>
-                          <StarRating style = { styles.rating }
-                              fullStarColor = { '#F5D200' }
-                              starSize = { 15 }
-                              disabled = { true }
-                              maxStars = { 5 }
-                              rating = { 5 } 
-                              selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                          />
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Price</Text>
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Total</Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-
-
-                <View style = { styles.lineStyle } />
-
-
-                </View>
-                <View style = { styles.card }>
-                  <View style = { styles.column }>
-                    <View style = { styles.row }>
-                      <View style = { styles.image }>
-                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
-                      </View>
-                      <View style = { styles.column }>
-                        <View>
-                            <Text style = { styles.title }>Title</Text>
-                        </View>
-                        <View>
-                          <StarRating style = { styles.rating }
-                              fullStarColor = { '#F5D200' }
-                              starSize = { 15 }
-                              disabled = { true }
-                              maxStars = { 5 }
-                              rating = { 5 } 
-                              selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                          />
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Price</Text>
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Total</Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-
-
-                <View style = { styles.lineStyle } />
-
-
-                </View>
-                <View style = { styles.card }>
-                  <View style = { styles.column }>
-                    <View style = { styles.row }>
-                      <View style = { styles.image }>
-                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
-                      </View>
-                      <View style = { styles.column }>
-                        <View>
-                            <Text style = { styles.title }>Title</Text>
-                        </View>
-                        <View>
-                          <StarRating style = { styles.rating }
-                              fullStarColor = { '#F5D200' }
-                              starSize = { 15 }
-                              disabled = { true }
-                              maxStars = { 5 }
-                              rating = { 5 } 
-                              selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                          />
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Price</Text>
-                        </View>
-                        <View>
-                          <Text style = { styles.price }>Total</Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-
-
-                <View style = { styles.lineStyle } />
-
-
-                </View>
-
-            </View>
+                )
+})}
+              </View>
             </ScrollView>
           </View>
         )
     }
 }
+
+const mapStateToProps = state => {
+  return {
+      item: state.item
+  }
+}
+
+export default connect(mapStateToProps)(listItem)

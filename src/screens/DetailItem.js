@@ -3,10 +3,15 @@ import { Text, View, Image, StyleSheet, TouchableOpacity, ScrollView } from 'rea
 import { 
     CardItem,
     Card,
-  } from 'native-base'
-  import LinearGradient from 'react-native-linear-gradient'
+} from 'native-base'
+import LinearGradient from 'react-native-linear-gradient'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import StarRating from 'react-native-star-rating'
+import { connect } from 'react-redux'
+
+
+import { getItem } from '../redux/action/Item'
+import { APP_URL } from '../config/Config'
 
 const styles = StyleSheet.create({
     root : {
@@ -15,6 +20,7 @@ const styles = StyleSheet.create({
     },
     image : {
         width: '100%',
+        height: 250,
         marginBottom: 5
     },
     container : {
@@ -165,12 +171,20 @@ const styles = StyleSheet.create({
 
 })
 
-export default class DetailItem extends Component {
+class DetailItem extends Component {
     constructor(props) {
         super(props);
         this.state = {
-          starCount: 0
-        };
+          starCount: 0,
+          isLoading: true,
+        }
+    }
+
+    async componentDidMount() {
+        const id = this.props.navigation.getParam('id')
+        await this.props.dispatch(getItem(id))
+        await this.setState({ isLoading: false })
+        console.log(id)
     }
 
     onStarRatingPress(rating) {
@@ -181,40 +195,47 @@ export default class DetailItem extends Component {
 
 
     render() {
-        return (
+        return(
             <View style = { styles.root }>
-                <View style = { styles.cardImage }>
+                {!this.state.isLoading && this.props.item.data.data.map((v, i) => { 
+                    return(
+                <View style = { styles.cardImage } key = { v.id_item }>
                     <View style = { styles.image }>
-                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
+                    <Image style = { styles.image } source = {{uri: APP_URL.concat(`image/item/${v.images}`)}} />
+                        {console.log(APP_URL.concat(`image/item/${v.images}`))}
                     </View>
                 </View>
+                )})}
 
                 
                 <ScrollView>
                     <View style = { styles.container }>
                         <View style = { styles.column }>
-                            <View style = { styles.cardItem }>
-                                <View style = { styles.column }>
-                                    <Text style = { styles.title }>Title</Text>
-                                </View>
-                                <View style = { styles.columnRating }>
-                                    <StarRating style = { styles.rating }
-                                        fullStarColor = { '#F5D200' }
-                                        starSize = { 15 }
-                                        disabled = { true }
-                                        maxStars = { 5 }
-                                        rating = { 5 } 
-                                        selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                                    />
-                                </View>
-                                <View style = { styles.column }>
-                                    <Text style = { styles.price }>Price</Text>
-                                </View>
-                                <View style = { styles.column }>
-                                    <Text style = { styles.describtion }>Describtion</Text>
-                                </View>
-                            </View>
-
+                            {!this.state.isLoading && this.props.item.data.data.map((v, i) => { 
+                                return(
+                                    <View style = { styles.cardItem }>
+                                        <View style = { styles.column }>
+                                            <Text style = { styles.title }>{ v.item_name }</Text>
+                                        </View>
+                                        <View style = { styles.columnRating }>
+                                            <StarRating style = { styles.rating }
+                                                fullStarColor = { '#F5D200' }
+                                                starSize = { 15 }
+                                                disabled = { true }
+                                                maxStars = { 5 }
+                                                rating = { v.rate } 
+                                                selectedStar = { (rating) => this.onStarRatingPress(rating)} 
+                                            />
+                                        </View>
+                                        <View style = { styles.column }>
+                                            <Text style = { styles.price }>Price</Text>
+                                        </View>
+                                        <View style = { styles.column }>
+                                            <Text style = { styles.describtion }>Describtion</Text>
+                                        </View>
+                                    </View>
+                                )
+                            })}
 
                             <View style = { styles.card }>
 
@@ -439,3 +460,11 @@ export default class DetailItem extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        item: state.item
+    }
+  }
+  
+export default connect(mapStateToProps)(DetailItem)

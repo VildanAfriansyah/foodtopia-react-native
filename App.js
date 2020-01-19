@@ -1,23 +1,23 @@
-import React, { Component } from 'react';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-// import storage from './src/redux/store';
-import { View, StyleSheet } from 'react-native';
-import Router from './src/config/Router';
+import React, { Component } from 'react'
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
+import storage from './src/redux/store'
+import { View, StyleSheet } from 'react-native'
+import Router from './src/config/Router'
 
-// const { store, persistor } = storage();
+const { store, persistor } = storage()
 
 class App extends Component {
   render() {
     return (
-      // <Provider store={store}>
-      //   <PersistGate persistor={persistor}>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
           <View style={styles.root}>
             <Router />
           </View>
-      //   </PersistGate>
-      // </Provider>
-    );
+        </PersistGate>
+      </Provider>
+    )
   }
 }
 
