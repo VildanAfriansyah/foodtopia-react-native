@@ -1,7 +1,12 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native'
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, ImageBackground, Image, Alert } from 'react-native'
 import { Card } from 'native-base'
 import LinearGradient from 'react-native-linear-gradient'
+import { connect } from 'react-redux'
+import AsyncStorage from '@react-native-community/async-storage'
+
+import { postUser } from '../redux/action/Login'
+
 const styles = StyleSheet.create({
   root : {
     flex: 1,
@@ -179,8 +184,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 3
   },
+  alert : {
+    fontWeight: 'bold',
+    margin: 5,
+    alignItems: 'center',
+  }
 })
-export default class App extends Component {
+
+class Login extends Component {
 
   constructor(props) {
     super(props)
@@ -189,19 +200,41 @@ export default class App extends Component {
       password: '',
       isLoading: false,
       isSuccess: false,
-      message: '',
+      msg: false,
     }
   }
 
   async login() {
+    // const { username } = this.state
+    // const { password } = this.state 
     const { username, password } = this.state
-    const data = {
-        username,
-        password
+        const data = {
+            username,
+            password,
+        }
+    await this.props.dispatch(postUser(data))
+    console.log(this.props.login.data.msg)
+    if(await this.props.login.success === true){
+      this.props.navigation.navigate('Home')
+    } else {
+      this.setState({
+        msg: true
+      })
     }
-    await this.props.dispatch(login(data))
-}
+  }
+
+//   async handleRedirect() {
+//     if (this.state.isSuccess === true) {
+//         Alert.alert('Login Message', 'Login Berhasil', [
+//             { text: 'OK', onPress: () => this.props.navigation.navigate('Home') },
+//         ])
+//     } else {
+//         Alert.alert('Login Message', 'Username atau Password Salah')
+//     }
+// }
+
   render() {
+    const { msg } = this.state
     return (
       <ImageBackground source = {require('../../images/background.jpg')} style = { styles.root }>
         
@@ -213,6 +246,10 @@ export default class App extends Component {
             <View style={ styles.formItem }>
               <TextInput style = { styles.input } secureTextEntry value={this.state.username} onChange={(e) => this.setState({ username: e.nativeEvent.text })} placeholder = 'Password' />
             </View>
+
+            <View style = { styles.alert }>
+                {msg && <Text style = { styles.alert }>{this.props.login.data.msg}</Text>}
+              </View>
             <View style = { styles.row }>
               <View style = { styles.row }>
                 <LinearGradient style={styles.buttonLogin} start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#e78d8d', '#e76565']} >
@@ -259,3 +296,11 @@ export default class App extends Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  return {
+      login: state.login
+  }
+}
+
+export default connect(mapStateToProps)(Login)

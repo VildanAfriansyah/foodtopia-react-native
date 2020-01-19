@@ -325,7 +325,7 @@ class DetailItem extends Component {
                                 return(
                                 <View style = { styles.row } key = { v.id_item }>
                                     <View style = { styles.listCard }>
-                                        <TouchableOpacity onPress = { ()=>this.props.navigation.push('Detail',{id : v.id_item})}>
+                                        <TouchableOpacity onPress = { ()=>this.props.navigation.replace('Detail',{id : v.id_item})}>
                                             <Card style = { styles.cardRecommendation }>
                                                 <Image style = { styles.listImage } source = {{uri: APP_URL.concat(`image/item/${v.images}`)}} />
                                                 <CardItem style = { styles.card }>
