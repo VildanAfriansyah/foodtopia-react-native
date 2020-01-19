@@ -8,9 +8,11 @@ import LinearGradient from 'react-native-linear-gradient'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import StarRating from 'react-native-star-rating'
 import { connect } from 'react-redux'
+import NumberFormat from 'react-number-format'
 
 
 import { getItem } from '../redux/action/Item'
+import { getCommentById } from '../redux/action/Comment'
 import { APP_URL } from '../config/Config'
 
 const styles = StyleSheet.create({
@@ -20,7 +22,7 @@ const styles = StyleSheet.create({
     },
     image : {
         width: '100%',
-        height: 250,
+        height: 200,
         marginBottom: 5
     },
     container : {
@@ -90,6 +92,7 @@ const styles = StyleSheet.create({
     },
     rowAddReview : {
         alignSelf: 'center',
+        width : 200
     },
     buttonAddReview : {
         width: 150,
@@ -167,6 +170,10 @@ const styles = StyleSheet.create({
     iconWhislist : {
         fontSize: 30,
         color: '#ff0000'
+    },
+    listItemColumn : {
+        flexDirection: 'column',
+        height: 100
     }
 
 })
@@ -183,9 +190,10 @@ class DetailItem extends Component {
     async componentDidMount() {
         const id = this.props.navigation.getParam('id')
         await this.props.dispatch(getItem(id))
+        await this.props.dispatch(getCommentById(id))
         await this.setState({ isLoading: false })
-        console.log(id)
     }
+    
 
     onStarRatingPress(rating) {
         this.setState({
@@ -197,12 +205,11 @@ class DetailItem extends Component {
     render() {
         return(
             <View style = { styles.root }>
-                {!this.state.isLoading && this.props.item.data.data.map((v, i) => { 
+                {!this.state.isLoading && this.props.item.dataId.data.map((v, i) => { 
                     return(
                 <View style = { styles.cardImage } key = { v.id_item }>
                     <View style = { styles.image }>
-                    <Image style = { styles.image } source = {{uri: APP_URL.concat(`image/item/${v.images}`)}} />
-                        {console.log(APP_URL.concat(`image/item/${v.images}`))}
+                        <Image style = { styles.image } source = {{uri: APP_URL.concat(`image/item/${v.images}`)}} />
                     </View>
                 </View>
                 )})}
@@ -211,14 +218,14 @@ class DetailItem extends Component {
                 <ScrollView>
                     <View style = { styles.container }>
                         <View style = { styles.column }>
-                            {!this.state.isLoading && this.props.item.data.data.map((v, i) => { 
+                            {!this.state.isLoading && this.props.item.dataId.data.map((v, i) => { 
                                 return(
-                                    <View style = { styles.cardItem }>
+                                    <View style = { styles.cardItem } key = { v.id_item }>
                                         <View style = { styles.column }>
                                             <Text style = { styles.title }>{ v.item_name }</Text>
                                         </View>
                                         <View style = { styles.columnRating }>
-                                            <StarRating style = { styles.rating }
+                                            <StarRating
                                                 fullStarColor = { '#F5D200' }
                                                 starSize = { 15 }
                                                 disabled = { true }
@@ -228,10 +235,16 @@ class DetailItem extends Component {
                                             />
                                         </View>
                                         <View style = { styles.column }>
-                                            <Text style = { styles.price }>Price</Text>
+                                            <NumberFormat 
+                                                value={v.price} 
+                                                displayType={'text'} 
+                                                thousandSeparator={true} 
+                                                prefix={'Rp. '} 
+                                                renderText={value => <Text style = { styles.price }>{value}</Text>} 
+                                            />
                                         </View>
                                         <View style = { styles.column }>
-                                            <Text style = { styles.describtion }>Describtion</Text>
+                                            <Text style = { styles.description }>{ v.description }</Text>
                                         </View>
                                     </View>
                                 )
@@ -261,24 +274,33 @@ class DetailItem extends Component {
 
 
                                 <View style = { styles.lineStyle } />
+                            
+                                {!this.state.isLoading && this.props.comment.data.data.map((v, i) => { 
+                                return(
+                                    <>
+                                        <View style = { styles.column } key = {v.id_item}>
+                                            <Text style = { styles.textUsername }>{ v.name_user }</Text>
+                                        </View>
+                                        <View style = { styles.columnRating }>
+                                            <StarRating style = { styles.rating }
+                                                fullStarColor = { '#F5D200' }
+                                                starSize = { 15 }
+                                                disabled = { true }
+                                                maxStars = { 5 }
+                                                rating = { v.rating } 
+                                                selectedStar = { (rating) => this.onStarRatingPress(rating)} 
+                                            />
+                                        </View>
+                                        <View style = { styles.column }>
+                                            <Text style = { styles.textComment }>{ v.comment }</Text>
+                                        </View>
 
+                                        <View style = { styles.lineStyle } />
+                                    </>
+                                    )
+                                })}
 
-                                <View style = { styles.column }>
-                                    <Text style = { styles.textUsername }>Username</Text>
-                                </View>
-                                <View style = { styles.columnRating }>
-                                    <StarRating style = { styles.rating }
-                                        fullStarColor = { '#F5D200' }
-                                        starSize = { 15 }
-                                        disabled = { true }
-                                        maxStars = { 5 }
-                                        rating = { 5 } 
-                                        selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                                    />
-                                </View>
-                                <View style = { styles.column }>
-                                    <Text style = { styles.textComment }>Comment</Text>
-                                </View>
+                                
                                 <View style = { styles.row }>
                                     <Text style = { styles.textReview }>Lihat semua ulasan</Text>
                                 </View>
@@ -293,140 +315,46 @@ class DetailItem extends Component {
                             </View>
 
                             <ScrollView horizontal = { true }>
-                                <View style = { styles.row }>
+                            {!this.state.isLoading && this.props.item.dataId.sugest.map((v, i) => { 
+                                return(
+                                <View style = { styles.row } key = { v.id_item }>
                                     <View style = { styles.listCard }>
-                                        <Card style = { styles.cardRecommendation }>
-                                            <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                                            <CardItem style = { styles.card }>
-                                                <View style = { styles.listItemColumn }>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.title }>Item</Text>
+                                        <TouchableOpacity>
+                                            <Card style = { styles.cardRecommendation }>
+                                                <Image style = { styles.listImage } source = {{uri: APP_URL.concat(`image/item/${v.images}`)}} />
+                                                <CardItem style = { styles.card }>
+                                                    <View style = { styles.listItemColumn }>
+                                                        <View style = { styles.listItemRow }>
+                                                            <Text style = { styles.title }>{ v.item_name }</Text>
+                                                        </View>
+                                                        <View style = { styles.columnRating }>
+                                                            <StarRating style = { styles.rating }
+                                                                fullStarColor = { '#F5D200' }
+                                                                starSize = { 15 }
+                                                                disabled = { true }
+                                                                maxStars = { 5 }
+                                                                rating = { v.rate } 
+                                                                selectedStar = { (rating) => this.onStarRatingPress(rating)} 
+                                                            />
+                                                        </View>
+                                                        <View style = { styles.price }>
+                                                            <NumberFormat 
+                                                                value={v.price} 
+                                                                displayType={'text'} 
+                                                                thousandSeparator={true} 
+                                                                prefix={'Rp. '} 
+                                                                renderText={value => <Text style = { styles.price }>{value}</Text>} 
+                                                            />
+                                                        </View>
                                                     </View>
-                                                    <View style = { styles.columnRating }>
-                                                        <StarRating style = { styles.rating }
-                                                            fullStarColor = { '#F5D200' }
-                                                            starSize = { 15 }
-                                                            disabled = { true }
-                                                            maxStars = { 5 }
-                                                            rating = { 5 } 
-                                                            selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                                                        />
-                                                    </View>
-                                                    <View style = { styles.price }>
-                                                        <Text style = { styles.listTextPrice }>price</Text>
-                                                    </View>
-                                                </View>
-                                            </CardItem>
-                                        </Card>
+                                                </CardItem>
+                                            </Card>
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
-                                <View style = { styles.row }>
-                                    <View style = { styles.listCard }>
-                                        <Card style = { styles.cardRecommendation }>
-                                            <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                                            <CardItem style = { styles.card }>
-                                                <View style = { styles.listItemColumn }>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.title }>Item</Text>
-                                                    </View>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.rating }>Rating</Text>
-                                                    </View>
-                                                    <View style = { styles.price }>
-                                                        <Text style = { styles.listTextPrice }>price</Text>
-                                                    </View>
-                                                </View>
-                                            </CardItem>
-                                        </Card>
-                                    </View>
-                                </View>
-                                <View style = { styles.row }>
-                                    <View style = { styles.listCard }>
-                                        <Card style = { styles.cardRecommendation }>
-                                            <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                                            <CardItem style = { styles.card }>
-                                                <View style = { styles.listItemColumn }>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.title }>Item</Text>
-                                                    </View>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.rating }>Rating</Text>
-                                                    </View>
-                                                    <View style = { styles.price }>
-                                                        <Text style = { styles.listTextPrice }>price</Text>
-                                                    </View>
-                                                </View>
-                                            </CardItem>
-                                        </Card>
-                                    </View>
-                                </View>
-                                <View style = { styles.row }>
-                                    <View style = { styles.listCard }>
-                                        <Card style = { styles.cardRecommendation }>
-                                            <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                                            <CardItem style = { styles.card }>
-                                                <View style = { styles.listItemColumn }>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.title }>Item</Text>
-                                                    </View>
-                                                    <View style = { styles.columnRating }>
-                                                        <StarRating style = { styles.rating }
-                                                            fullStarColor = { '#F5D200' }
-                                                            starSize = { 15 }
-                                                            disabled = { true }
-                                                            maxStars = { 5 }
-                                                            rating = { 5 } 
-                                                            selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                                                        />
-                                                    </View>
-                                                    <View style = { styles.price }>
-                                                        <Text style = { styles.listTextPrice }>price</Text>
-                                                    </View>
-                                                </View>
-                                            </CardItem>
-                                        </Card>
-                                    </View>
-                                </View>
-                                <View style = { styles.row }>
-                                    <View style = { styles.listCard }>
-                                        <Card style = { styles.cardRecommendation }>
-                                            <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                                            <CardItem style = { styles.card }>
-                                                <View style = { styles.listItemColumn }>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.title }>Item</Text>
-                                                    </View>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.rating }>Rating</Text>
-                                                    </View>
-                                                    <View style = { styles.price }>
-                                                        <Text style = { styles.listTextPrice }>price</Text>
-                                                    </View>
-                                                </View>
-                                            </CardItem>
-                                        </Card>
-                                    </View>
-                                </View>
-                                <View style = { styles.row }>
-                                    <View style = { styles.listCard }>
-                                        <Card style = { styles.cardRecommendation }>
-                                            <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                                            <CardItem style = { styles.card }>
-                                                <View style = { styles.listItemColumn }>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.title }>Item</Text>
-                                                    </View>
-                                                    <View style = { styles.listItemRow }>
-                                                        <Text style = { styles.rating }>Rating</Text>
-                                                    </View>
-                                                    <View style = { styles.price }>
-                                                        <Text style = { styles.listTextPrice }>price</Text>
-                                                    </View>
-                                                </View>
-                                            </CardItem>
-                                        </Card>
-                                    </View>
-                                </View>
+                                )
+                            })}
+
                             </ScrollView>
                         </View>
                     </View>
@@ -463,7 +391,8 @@ class DetailItem extends Component {
 
 const mapStateToProps = state => {
     return {
-        item: state.item
+        item: state.item,
+        comment : state.comment
     }
   }
   

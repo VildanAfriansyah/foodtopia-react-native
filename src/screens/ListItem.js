@@ -139,7 +139,7 @@ class listItem extends Component {
   
   async componentDidMount() {
       await this.props.dispatch(getItems())
-      await this.setState({ isLoading: false })
+       this.setState({ isLoading: false })
   }
 
     render() {
@@ -172,45 +172,45 @@ class listItem extends Component {
 
               {!this.state.isLoading && this.props.item.data.data.map((v, i) => {
                 return(
-                <TouchableOpacity key = {v.id_item} onPress = { ()=>this.props.navigation.navigate('Detail',{id : v.id_item})}>
-                  <View style = { styles.card }>
-                    <View style = { styles.column }>
-                      <View style = { styles.row }>
-                        <View style = { styles.image }>
-                          <Image style = { styles.image } source={{uri: APP_URL.concat(`image/item/${v.images}`)}} />
-                        </View>
-                        <View style = { styles.column }>
-                          <View>
-                            <Text style = { styles.title }>{ v.item_name }</Text>
+                  <TouchableOpacity key = {v.id_item} onPress = { ()=>this.props.navigation.navigate('Detail',{id : v.id_item})}>
+                    <View style = { styles.card }>
+                      <View style = { styles.column }>
+                        <View style = { styles.row }>
+                          <View style = { styles.image }>
+                            <Image style = { styles.image } source={{uri: APP_URL.concat(`image/item/${v.images}`)}} />
                           </View>
-                          <View style = { styles.rating }>
-                            <StarRating
-                                fullStarColor = { '#F5D200' }
-                                starSize = { 15 }
-                                disabled = { true }
-                                maxStars = { 5 }
-                                rating = { v.rate } 
-                                selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                            />
-                          </View>
-                          <View>
-                            <Text style = { styles.price }>{ v.price }</Text>
-                          </View>
-                          <View>
-                            <Text style = { styles.price }>{ v.restaurant }</Text>
+                          <View style = { styles.column }>
+                            <View>
+                              <Text style = { styles.title }>{ v.item_name }</Text>
+                            </View>
+                            <View style = { styles.rating }>
+                              <StarRating
+                                  fullStarColor = { '#F5D200' }
+                                  starSize = { 15 }
+                                  disabled = { true }
+                                  maxStars = { 5 }
+                                  rating = { v.rate } 
+                                  selectedStar = { (rating) => this.onStarRatingPress(rating)} 
+                              />
+                            </View>
+                            <View>
+                              <Text style = { styles.price }>{ v.price }</Text>
+                            </View>
+                            <View>
+                              <Text style = { styles.price }>{ v.restaurant }</Text>
+                            </View>
                           </View>
                         </View>
                       </View>
+
+
+                    <View style = { styles.lineStyle } />
+
+
                     </View>
-
-
-                  <View style = { styles.lineStyle } />
-
-
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
                 )
-})}
+              })}
               </View>
             </ScrollView>
           </View>
