@@ -4,9 +4,15 @@ import {
   Input, 
   CardItem,
   Card,
+  Spinner
 } from 'native-base'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import StarRating from 'react-native-star-rating'
+import NumberFormat from 'react-number-format'
+import { connect } from 'react-redux'
+
+import { getItems } from '../redux/action/Item'
+import { APP_URL } from '../config/Config'
 
 const styles = StyleSheet.create({
   root : {
@@ -78,7 +84,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     flexDirection: 'row',
-    // backgroundColor: 'blue',
   },
   searchPlaceholder : {
     fontSize: 12,
@@ -146,9 +151,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   listTextItem : {
-    color : '#6f5d5d'
+    fontWeight: 'bold',
+    fontSize: 15
   },
   listTextPrice : {
+    color: '#8cfc03',
     fontWeight: 'bold'
   },
   listTextRating : {
@@ -215,7 +222,20 @@ const styles = StyleSheet.create({
 
 
 
-export default class MainScreen extends Component {
+class MainScreen extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+        isLoading: true,
+    }
+  }
+
+  async componentDidMount() {
+    await this.props.dispatch(getItems())
+    await this.setState({ isLoading: false })
+  }
+
   render() {
     return (
       <View style = { styles.root }>
@@ -281,127 +301,44 @@ export default class MainScreen extends Component {
         <View>
         <ScrollView horizontal = { true }>
             <View style = { styles.listCard }>
-              <TouchableOpacity onPress = { ()=>this.props.navigation.navigate('Detail')}>
-                <Card style = { styles.card } >
-                    <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                  <CardItem style = { styles.card }>
-                    <View style = { styles.listItemColumn }>
-                      <View style = { styles.listItemRow }>
-                        <Text style = { styles.listTextItem }>Item</Text>
-                      </View>
-                      <View style = { styles.listItemRow }>
-                        <StarRating style = { styles.rating }
-                            fullStarColor = { '#F5D200' }
-                            starSize = { 15 }
-                            disabled = { true }
-                            maxStars = { 5 }
-                            rating = { 5 } 
-                            selectedStar = { (rating) => this.onStarRatingPress(rating)} 
-                        />
-                      </View>
-                      <View style = { styles.listItemRow }>
-                        <Text style = { styles.listTextPrice }>price</Text>
-                      </View>
-                    </View>
-                  </CardItem>
-                </Card>
-              </TouchableOpacity>
-              <Card style = { styles.card }>
-                  <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                <CardItem style = { styles.card }>
-                  <View style = { styles.listItemColumn }>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextItem }>Item</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextRating }>Rating</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextPrice }>price</Text>
-                    </View>
-                  </View>
-                </CardItem>
-              </Card>
-              <Card style = { styles.card }>
-                  <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                <CardItem style = { styles.card }>
-                  <View style = { styles.listItemColumn }>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextItem }>Item</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextRating }>Rating</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextPrice }>price</Text>
-                    </View>
-                  </View>
-                </CardItem>
-              </Card>
-              <Card style = { styles.card }>
-                  <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                <CardItem style = { styles.card }>
-                  <View style = { styles.listItemColumn }>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextItem }>Item</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextRating }>Rating</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextPrice }>price</Text>
-                    </View>
-                  </View>
-                </CardItem>
-              </Card>
-              <Card style = { styles.card }>
-                  <Image style = { styles.listImage } source = { require('../../images/1.jpg') } />
-                <CardItem style = { styles.card }>
-                  <View style = { styles.listItemColumn }>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextItem }>Item</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextRating }>Rating</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextPrice }>price</Text>
-                    </View>
-                  </View>
-                </CardItem>
-              </Card>
-              <Card style = { styles.card }>
-                  <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                <CardItem style = { styles.card }>
-                  <View style = { styles.listItemColumn }>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextItem }>Item</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextRating }>Rating</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextPrice }>price</Text>
-                    </View>
-                  </View>
-                </CardItem>
-              </Card>
-              <Card style = { styles.card }>
-                  <Image style = { styles.listImage } source = {require('../../images/1.jpg')} />
-                <CardItem style = { styles.card }>
-                  <View style = { styles.listItemColumn }>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextItem }>Item</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextRating }>Rating</Text>
-                    </View>
-                    <View style = { styles.listItemRow }>
-                      <Text style = { styles.listTextPrice }>price</Text>
-                    </View>
-                  </View>
-                </CardItem>
-              </Card>
+            { this.state.isLoading && <Spinner color = 'green' />}
+              { !this.state.isLoading && this.props.item.data.data.map((v, i) => {
+                return(
+                  <TouchableOpacity onPress = { ()=>this.props.navigation.navigate('Detail', {id : v.id_item})}>
+                    <Card style = { styles.card } >
+                        <Image style = { styles.listImage } source={{uri: APP_URL.concat(`image/item/${v.images}`)}} />
+                      <CardItem style = { styles.card }>
+                        <View style = { styles.listItemColumn }>
+                          <View style = { styles.listItemRow }>
+                            <Text style = { styles.listTextItem }>{ v.item_name }</Text>
+                          </View>
+                          <View style = { styles.listItemRow }>
+                            <StarRating style = { styles.rating }
+                                fullStarColor = { '#F5D200' }
+                                starSize = { 15 }
+                                disabled = { true }
+                                maxStars = { 5 }
+                                rating = { v.rate } 
+                                selectedStar = { (rating) => this.onStarRatingPress(rating)} 
+                            />
+                          </View>
+                          <View style = { styles.listItemRow }>
+                            <NumberFormat 
+                              value={v.price} 
+                              displayType={'text'} 
+                              thousandSeparator={true} 
+                              prefix={'Rp. '} 
+                              renderText={value => <Text style = { styles.listTextPrice }>{value}</Text>} 
+                            />
+                          </View>
+                        </View>
+                      </CardItem>
+                    </Card>
+                  </TouchableOpacity>
+
+)
+              })}
+        
             </View>
           </ScrollView>
         </View>
@@ -619,3 +556,11 @@ export default class MainScreen extends Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  return {
+      item: state.item
+  }
+}
+
+export default connect(mapStateToProps)(MainScreen)

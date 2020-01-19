@@ -14,6 +14,7 @@ import NumberFormat from 'react-number-format'
 import { getItem } from '../redux/action/Item'
 import { getCommentById } from '../redux/action/Comment'
 import { APP_URL } from '../config/Config'
+import Loading from './Loading'
 
 const styles = StyleSheet.create({
     root : {
@@ -66,7 +67,8 @@ const styles = StyleSheet.create({
     },
     price : {
         fontWeight: 'bold',
-        fontSize: 15
+        fontSize: 15,
+        color: '#8cfc03'
     },
     lineStyle:{
         borderWidth: 0.6,
@@ -182,8 +184,8 @@ class DetailItem extends Component {
     constructor(props) {
         super(props);
         this.state = {
-          starCount: 0,
-          isLoading: true,
+            starCount: 0,
+            isLoading: true,
         }
     }
 
@@ -197,13 +199,16 @@ class DetailItem extends Component {
 
     onStarRatingPress(rating) {
         this.setState({
-          starCount: rating
+            starCount: rating
         });
     }
 
 
     render() {
         return(
+            <>
+            {this.state.isLoading && <Loading />}
+          { !this.state.isLoading &&
             <View style = { styles.root }>
                 {!this.state.isLoading && this.props.item.dataId.data.map((v, i) => { 
                     return(
@@ -274,7 +279,7 @@ class DetailItem extends Component {
 
 
                                 <View style = { styles.lineStyle } />
-                            
+
                                 {!this.state.isLoading && this.props.comment.data.data.map((v, i) => { 
                                 return(
                                     <>
@@ -315,11 +320,12 @@ class DetailItem extends Component {
                             </View>
 
                             <ScrollView horizontal = { true }>
+
                             {!this.state.isLoading && this.props.item.dataId.sugest.map((v, i) => { 
                                 return(
                                 <View style = { styles.row } key = { v.id_item }>
                                     <View style = { styles.listCard }>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity onPress = { ()=>this.props.navigation.push('Detail',{id : v.id_item})}>
                                             <Card style = { styles.cardRecommendation }>
                                                 <Image style = { styles.listImage } source = {{uri: APP_URL.concat(`image/item/${v.images}`)}} />
                                                 <CardItem style = { styles.card }>
@@ -385,6 +391,8 @@ class DetailItem extends Component {
                     </View>
                 </View>
             </View>
+    }
+            </>
         )
     }
 }

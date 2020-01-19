@@ -5,18 +5,21 @@ import {
     CardItem,
     Card,
     ListItem,
+    Spinner
 } from 'native-base'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import StarRating from 'react-native-star-rating'
 import { connect } from 'react-redux'
+import NumberFormat from 'react-number-format'
 
 
 import { getItems } from '../redux/action/Item'
 import { APP_URL } from '../config/Config'
+import Loading from './Loading'
 
 const styles = StyleSheet.create({
   root : {
-    flex:1,
+    flex: 1,
     backgroundColor: '#FFF',
   },
   container : {
@@ -123,7 +126,16 @@ const styles = StyleSheet.create({
   },
   rating : {
     width: 100
-  }
+  },
+  price : {
+      fontWeight: 'bold',
+      fontSize: 15,
+      color: '#8cfc03'
+  },
+  title : {
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
     
     
   })
@@ -144,6 +156,10 @@ class listItem extends Component {
 
     render() {
         return (
+
+        <>
+         {this.state.isLoading && <Loading />}
+          { !this.state.isLoading &&
             <View style = { styles.root }>
               <View style = { styles.box }>
                 <View style = { styles.header }>
@@ -169,7 +185,6 @@ class listItem extends Component {
 
               <View style = { styles.box }>
 
-
               {!this.state.isLoading && this.props.item.data.data.map((v, i) => {
                 return(
                   <TouchableOpacity key = {v.id_item} onPress = { ()=>this.props.navigation.navigate('Detail',{id : v.id_item})}>
@@ -194,10 +209,16 @@ class listItem extends Component {
                               />
                             </View>
                             <View>
-                              <Text style = { styles.price }>{ v.price }</Text>
+                              <NumberFormat 
+                                value={v.price} 
+                                displayType={'text'} 
+                                thousandSeparator={true} 
+                                prefix={'Rp. '} 
+                                renderText={value => <Text style = { styles.price }>{value}</Text>} 
+                              />
                             </View>
                             <View>
-                              <Text style = { styles.price }>{ v.restaurant }</Text>
+                              <Text style = { styles.restaurant }>{ v.restaurant }</Text>
                             </View>
                           </View>
                         </View>
@@ -214,6 +235,8 @@ class listItem extends Component {
               </View>
             </ScrollView>
           </View>
+    }
+        </>
         )
     }
 }

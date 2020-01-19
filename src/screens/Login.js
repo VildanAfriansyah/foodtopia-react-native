@@ -181,22 +181,42 @@ const styles = StyleSheet.create({
   },
 })
 export default class App extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      username: '',
+      password: '',
+      isLoading: false,
+      isSuccess: false,
+      message: '',
+    }
+  }
+
+  async login() {
+    const { username, password } = this.state
+    const data = {
+        username,
+        password
+    }
+    await this.props.dispatch(login(data))
+}
   render() {
     return (
       <ImageBackground source = {require('../../images/background.jpg')} style = { styles.root }>
         
         <View style = { styles.container }>
           <Card style = {styles.card} transparent>
-            <View style={styles.formItem}>
-              <TextInput style={styles.input} placeholder='Username' />
+            <View style = { styles.formItem }>
+              <TextInput style = { styles.input } value={this.state.password} onChange={(e) => this.setState({ password: e.nativeEvent.text })} placeholder='Username' />
             </View>
-            <View style={styles.formItem}>
-              <TextInput style={styles.input} placeholder='Password' />
+            <View style={ styles.formItem }>
+              <TextInput style = { styles.input } secureTextEntry value={this.state.username} onChange={(e) => this.setState({ username: e.nativeEvent.text })} placeholder = 'Password' />
             </View>
             <View style = { styles.row }>
               <View style = { styles.row }>
                 <LinearGradient style={styles.buttonLogin} start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#e78d8d', '#e76565']} >
-                  <TouchableOpacity style = { styles.buttonLogin }>
+                  <TouchableOpacity style = { styles.buttonLogin } onPress = {() => this.login()}>
                     <Text style = { styles.buttonTextLogin }>MASUK</Text>
                   </TouchableOpacity>
                 </LinearGradient>

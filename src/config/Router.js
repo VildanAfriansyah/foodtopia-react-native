@@ -11,6 +11,8 @@ import Whistlist from '../screens/Whistlist'
 import Cart from '../screens/Cart'
 import DetailItem from '../screens/DetailItem'
 import ListItem from '../screens/ListItem'
+import Login from '../screens/Login'
+// import Register from '../screens/Register'
 
 const navHome = createStackNavigator({
     Home: {
@@ -72,7 +74,19 @@ const navProfile = createStackNavigator({
             headerShown: false,
         }
     },
-}, { initialRouteName: 'profile' }) 
+    userRedirect: {
+        screen: UserRedirect,
+        navigationOptions: {
+            headerShown: false,
+        }
+    },
+    Login: {
+        screen: Login,
+        navigationOptions: {
+            headerShown: false,
+        }
+    },
+}, { initialRouteName: 'userRedirect' }) 
 
 const BottomNav = createBottomTabNavigator({
     MainScreen: {
