@@ -205,33 +205,21 @@ class Login extends Component {
   }
 
   async login() {
-    // const { username } = this.state
-    // const { password } = this.state 
     const { username, password } = this.state
         const data = {
             username,
             password,
         }
     await this.props.dispatch(postUser(data))
-    console.log(this.props.login.data.msg)
     if(await this.props.login.success === true){
       this.props.navigation.navigate('Home')
+      await AsyncStorage.setItem(token, this.props.login.data.auth)
     } else {
       this.setState({
         msg: true
       })
     }
   }
-
-//   async handleRedirect() {
-//     if (this.state.isSuccess === true) {
-//         Alert.alert('Login Message', 'Login Berhasil', [
-//             { text: 'OK', onPress: () => this.props.navigation.navigate('Home') },
-//         ])
-//     } else {
-//         Alert.alert('Login Message', 'Username atau Password Salah')
-//     }
-// }
 
   render() {
     const { msg } = this.state

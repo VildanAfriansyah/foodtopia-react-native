@@ -4,6 +4,12 @@ import { Input} from 'native-base'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import LinearGradient from 'react-native-linear-gradient'
 import StarRating from 'react-native-star-rating'
+import { connect } from 'react-redux'
+import AsyncStorage from '@react-native-community/async-storage'
+import jwt_decode from 'jwt-decode'
+import NumberFormat from 'react-number-format'
+
+import { getCart } from '../redux/action/Cart'
 
 const styles = StyleSheet.create({
     root : {
@@ -50,7 +56,8 @@ const styles = StyleSheet.create({
     },
     price : {
         fontWeight: 'bold',
-        fontSize: 15
+        fontSize: 15,
+        color: '#8cfc03'
     },
     input : {
         borderWidth:0.6,
@@ -173,7 +180,25 @@ const styles = StyleSheet.create({
 
 })
 
-export default class Cart extends Component {
+class Cart extends Component {
+    
+    constructor(props) {
+        super(props)
+        this.state = {
+          name: ''
+        }
+      }
+
+      async componentDidMount (){
+        const token = this.props.login.data.auth
+        const decode = jwt_decode(token)
+        const id = decode.id
+        console.log(token,id)
+        await this.props.dispatch(getCart(id,token))
+      }
+    
+    
+
     render() {
         return (
             <View style={ styles.root }>
@@ -181,97 +206,54 @@ export default class Cart extends Component {
 
                     
                     <ScrollView>
-                        <View style = { styles.card }>
-                            <View style = { styles.column }>
+                    <View style = { styles.card }>
+                        {!this.state.isLoading && this.props.cart.data.map((v, i) => { 
+                    return(
+                        <>
+                            <View style = { styles.column } key = { v.id_cart }>
                                 <View style = { styles.row }>
                                     <View style = { styles.image }>
                                         <Image style = { styles.image } source = {require('../../images/1.jpg')} />
                                     </View>
                                     <View style = { styles.column }>
                                         <View>
-                                            <Text style = { styles.title }>Title</Text>
+                                            <Text style = { styles.title }>{ v.item_name }</Text>
                                         </View>
-                                        <View>
-                                            <StarRating style = { styles.rating }
+                                        <View style = { styles.rating }>
+                                            <StarRating 
                                                 fullStarColor = { '#F5D200' }
                                                 starSize = { 15 }
                                                 disabled = { true }
                                                 maxStars = { 5 }
-                                                rating = { 5 } 
+                                                rating = { v.rate } 
                                                 selectedStar = { (rating) => this.onStarRatingPress(rating)} 
                                             />
                                         </View>
                                         <View>
-                                            <Text style = { styles.price }>Price</Text>
-                                        </View>
-                                        <View>
-                                            <Text style = { styles.price }>Total</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                            <View style = { styles.rowTotal }>
-                                <View style = { styles.row }>
-                                    <View style = { styles.row }>
-                                        <TouchableOpacity>
-                                            <Icon style = { styles.buttonTotal } name = 'minus-square' />
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style = { styles.input }>
-                                        <Input style = { styles.textInput } value = '1' />
-                                    </View>
-                                    <View style = { styles.row }>
-                                        <TouchableOpacity>
-                                            <Icon style = { styles.buttonTotal } name = 'plus-square' />
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style = { styles.row }>
-                                    <TouchableOpacity>
-                                        <Icon style = { styles.buttonDelete } name = 'trash' />
-                                    </TouchableOpacity>
-                                </View>
-                                <View style = { styles.row }>
-                                    <TouchableOpacity style = { styles.addCart }>
-                                        <LinearGradient style = { styles.buy } start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#e78d8d', '#e76565']} >
-                                            <Text style = { styles.textBuy }>Beli</Text>
-                                        </LinearGradient>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-
-                            <View style = { styles.lineStyle } />
-
-
-                            <View style = { styles.column }>
-                                <View style = { styles.row }>
-                                    <View style = { styles.image }>
-                                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
-                                    </View>
-                                    <View style = { styles.column }>
-                                        <View>
-                                            <Text style = { styles.title }>Title</Text>
-                                        </View>
-                                        <View>
-                                            <StarRating style = { styles.rating }
-                                                fullStarColor = { '#F5D200' }
-                                                starSize = { 15 }
-                                                disabled = { true }
-                                                maxStars = { 5 }
-                                                rating = { 5 } 
-                                                selectedStar = { (rating) => this.onStarRatingPress(rating)} 
+                                            <NumberFormat 
+                                                value={v.price} 
+                                                displayType={'text'} 
+                                                thousandSeparator={true} 
+                                                prefix={'Rp. '} 
+                                                renderText={value => <Text style = { styles.price }>{value}</Text>} 
                                             />
                                         </View>
                                         <View>
-                                            <Text style = { styles.price }>Price</Text>
-                                        </View>
-                                        <View>
-                                            <Text style = { styles.price }>Total</Text>
+                                            <NumberFormat 
+                                                value={v.price * v.total} 
+                                                displayType={'text'} 
+                                                thousandSeparator={true} 
+                                                prefix={'Rp. '} 
+                                                renderText={value => <Text>{value}</Text>} 
+                                            />
                                         </View>
                                     </View>
                                 </View>
                             </View>
+                            
+
+                            {/* <View style = { styles.lineStyle } /> */}
+                            
                             <View style = { styles.rowTotal }>
                                 <View style = { styles.row }>
                                     <View style = { styles.row }>
@@ -280,7 +262,7 @@ export default class Cart extends Component {
                                         </TouchableOpacity>
                                     </View>
                                     <View style = { styles.input }>
-                                        <Input style = { styles.textInput } value = '1' />
+                                            <Input style = { styles.textInput }  >{ v.total }</Input>
                                     </View>
                                     <View style = { styles.row }>
                                         <TouchableOpacity>
@@ -301,118 +283,13 @@ export default class Cart extends Component {
                                     </TouchableOpacity>
                                 </View>
                             </View>
-
-
-                            <View style = { styles.lineStyle } />
-
-
-                            <View style = { styles.column }>
-                                <View style = { styles.row }>
-                                    <View style = { styles.image }>
-                                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
-                                    </View>
-                                    <View style = { styles.column }>
-                                        <View>
-                                            <Text style = { styles.title }>Title</Text>
-                                        </View>
-                                        <View>
-                                            <Text style = { styles.rating }>rating</Text>
-                                        </View>
-                                        <View>
-                                            <Text style = { styles.price }>Price</Text>
-                                        </View>
-                                        <View>
-                                            <Text style = { styles.price }>Total</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                            <View style = { styles.rowTotal }>
-                                <View style = { styles.row }>
-                                    <View style = { styles.row }>
-                                        <TouchableOpacity>
-                                            <Icon style = { styles.buttonTotal } name = 'minus-square' />
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style = { styles.input }>
-                                        <Input style = { styles.textInput } value = '1' />
-                                    </View>
-                                    <View style = { styles.row }>
-                                        <TouchableOpacity>
-                                            <Icon style = { styles.buttonTotal } name = 'plus-square' />
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style = { styles.row }>
-                                    <TouchableOpacity>
-                                        <Icon style = { styles.buttonDelete } name = 'trash' />
-                                    </TouchableOpacity>
-                                </View>
-                                <View style = { styles.row }>
-                                    <TouchableOpacity style = { styles.addCart }>
-                                        <LinearGradient style = { styles.buy } start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#e78d8d', '#e76565']} >
-                                            <Text style = { styles.textBuy }>Beli</Text>
-                                        </LinearGradient>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
+                            </>
+                            )
+                        })}
 
                             <View style = { styles.lineStyle } />
 
-                            <View style = { styles.column }>
-                                <View style = { styles.row }>
-                                    <View style = { styles.image }>
-                                        <Image style = { styles.image } source = {require('../../images/1.jpg')} />
-                                    </View>
-                                    <View style = { styles.column }>
-                                        <View>
-                                            <Text style = { styles.title }>Title</Text>
-                                        </View>
-                                        <View>
-                                            <Text style = { styles.rating }>rating</Text>
-                                        </View>
-                                        <View>
-                                            <Text style = { styles.price }>Price</Text>
-                                        </View>
-                                        <View>
-                                            <Text style = { styles.price }>Total</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                            <View style = { styles.rowTotal }>
-                                <View style = { styles.row }>
-                                    <View style = { styles.row }>
-                                        <TouchableOpacity>
-                                            <Icon style = { styles.buttonTotal } name = 'minus-square' />
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style = { styles.input }>
-                                        <Input style = { styles.textInput } value = '1' />
-                                    </View>
-                                    <View style = { styles.row }>
-                                        <TouchableOpacity>
-                                            <Icon style = { styles.buttonTotal } name = 'plus-square' />
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style = { styles.row }>
-                                    <TouchableOpacity>
-                                        <Icon style = { styles.buttonDelete } name = 'trash' />
-                                    </TouchableOpacity>
-                                </View>
-                                <View style = { styles.row }>
-                                    <TouchableOpacity style = { styles.addCart }>
-                                        <LinearGradient style = { styles.buy } start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#e78d8d', '#e76565']} >
-                                            <Text style = { styles.textBuy }>Beli</Text>
-                                        </LinearGradient>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
 
-
-                            <View style = { styles.lineStyle } />
 
 
                         </View>
@@ -421,7 +298,7 @@ export default class Cart extends Component {
                 <View style = { styles.footer }>
                     <View style = { styles.rowCart }>
                         <View style = { styles.whislist }>
-                            <Text style = { styles.subtotal }>Total : Rp. 150.000</Text>
+                            <Text style = { styles.subtotal }>Total : Rp. 60.000</Text>
                         </View>
                         <View style = { styles.row }>
                             <View style = { styles.rowFooter }>
@@ -450,3 +327,12 @@ export default class Cart extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        login: state.login,
+        cart: state.cart
+    }
+  }
+  
+export default connect(mapStateToProps)(Cart)
